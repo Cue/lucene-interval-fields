@@ -31,7 +31,7 @@ import java.io.Reader;
 public class NumericIntervalField extends AbstractField {
   static final int DEFAULT_PRECISION_STEP = 4;
 
-  private final NumericIntervalTokenStream tokenStream;
+  private final NumericIntervalTokenStream tokenStreamValue;
 
   public NumericIntervalField(String name, boolean index, long min, long max) {
     this(name, index, min, max, DEFAULT_PRECISION_STEP);
@@ -56,7 +56,7 @@ public class NumericIntervalField extends AbstractField {
     }, precisionStep, min, max);
     ImmutableList<Pair<Long, Integer>> segments = segmentsBuilder.build();
 
-    tokenStream = new NumericIntervalTokenStream(segments);
+    tokenStreamValue = new NumericIntervalTokenStream(segments);
   }
 
   @Override
@@ -71,7 +71,7 @@ public class NumericIntervalField extends AbstractField {
 
   @Override
   public TokenStream tokenStreamValue() {
-    return this.isIndexed() ? tokenStream : null;
+    return this.isIndexed() ? tokenStreamValue : null;
   }
 
   public static NumericIntervalField fromString(String name, boolean index, String rangeString) {
