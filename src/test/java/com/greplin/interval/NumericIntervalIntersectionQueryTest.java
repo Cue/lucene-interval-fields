@@ -28,6 +28,7 @@ import java.io.IOException;
 public class NumericIntervalIntersectionQueryTest extends BaseIntervalQueryTest {
 
   @Before
+  @Override
   public void setUp() throws IOException {
     super.setUp();
     addDocument(1, 1000, 2000);
