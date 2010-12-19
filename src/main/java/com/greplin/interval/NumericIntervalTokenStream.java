@@ -27,18 +27,30 @@ import java.io.Serializable;
 /**
  * Token stream for a numeric interval.
  */
-class NumericIntervalTokenStream extends TokenStream implements Serializable {
+final class NumericIntervalTokenStream
+    extends TokenStream
+    implements Serializable {
+  /**
+   * Segments that make up the interval.
+   */
   private final ImmutableList<Pair<Long, Integer>> segments;
 
+  /**
+   * The term attribute.
+   */
   private final TermAttribute termAtt = addAttribute(TermAttribute.class);
 
+  /**
+   * Current segment number.
+   */
   private int i = 0;
 
   /**
    * Creates a token stream for a numeric interval.
    * @param segments The segments.
    */
-  public NumericIntervalTokenStream(ImmutableList<Pair<Long, Integer>> segments) {
+  public NumericIntervalTokenStream(
+      final ImmutableList<Pair<Long, Integer>> segments) {
     super();
     this.segments = segments;
   }
@@ -67,7 +79,8 @@ class NumericIntervalTokenStream extends TokenStream implements Serializable {
 
   @Override
   public String toString() {
-    return new StringBuilder("(interval,parts=").append(segments).append(')').toString();
+    return new StringBuilder("(interval,parts=").append(segments).append(')')
+        .toString();
   }
 
   @Override
@@ -76,8 +89,8 @@ class NumericIntervalTokenStream extends TokenStream implements Serializable {
   }
 
   @Override
-  public boolean equals(Object obj) {
-    return obj != null && obj.getClass() == this.getClass() &&
-        segments.equals(((NumericIntervalTokenStream) obj).segments);
+  public boolean equals(final Object obj) {
+    return obj != null && obj.getClass() == this.getClass()
+        && segments.equals(((NumericIntervalTokenStream) obj).segments);
   }
 }

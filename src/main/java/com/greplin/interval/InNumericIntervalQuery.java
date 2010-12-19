@@ -27,35 +27,57 @@ import org.apache.lucene.search.TermQuery;
 import java.io.IOException;
 
 /**
- * Query for numeric intervals.
+ * Query that finds intervals containing a given value.
  */
-public class InNumericIntervalQuery extends BooleanQuery {
+public final class InNumericIntervalQuery extends BooleanQuery {
+  /**
+   * The search value.
+   */
   private final long value;
 
-  public InNumericIntervalQuery(String name, long value) {
+  /**
+   * Creates a query to find intervals a number is in.
+   * @param name The name of the field to search.
+   * @param value The value to find containing intervals.
+   */
+  public InNumericIntervalQuery(final String name,
+                                final long value) {
     this(name, value, NumericIntervalField.DEFAULT_PRECISION_STEP);
   }
 
-  public InNumericIntervalQuery(String name, long value, int precisionStep) {
+
+  /**
+   * Creates a query to find intervals a number is in.
+   * @param name The name of the field to search.
+   * @param value The search value.
+   * @param precisionStep The precision step used when indexing the field.
+   */
+  public InNumericIntervalQuery(final String name,
+                                final long value,
+                                final int precisionStep) {
     super(true);
     this.value = value;
 
-    TokenStream stream = new NumericTokenStream(precisionStep).setLongValue(value);
+    TokenStream stream = new NumericTokenStream(precisionStep)
+        .setLongValue(value);
 
     try {
       stream.reset();
       while (stream.incrementToken()) {
         this.add(
-            new TermQuery(new Term(name, stream.getAttribute(TermAttribute.class).term())),
+            new TermQuery(
+                new Term(name,
+                         stream.getAttribute(TermAttribute.class).term())),
             BooleanClause.Occur.SHOULD);
       }
     } catch (IOException e) {
-      throw new IllegalStateException("This should never happen - NumericTokenStream does no IO.");
+      throw new IllegalStateException(
+          "This should never happen - NumericTokenStream does no IO.");
     }
   }
 
   @Override
-  public String toString(String field) {
+  public String toString(final String field) {
     return String.format("inInterval(%d, %s)", value, field);
   }
 
@@ -65,7 +87,9 @@ public class InNumericIntervalQuery extends BooleanQuery {
   }
 
   @Override
-  public boolean equals(Object o) {
-    return o != null && o.getClass() == this.getClass() && ((InNumericIntervalQuery) o).value == value;
+  public boolean equals(final Object o) {
+    return o != null
+        && o.getClass() == this.getClass()
+        && ((InNumericIntervalQuery) o).value == value;
   }
 }

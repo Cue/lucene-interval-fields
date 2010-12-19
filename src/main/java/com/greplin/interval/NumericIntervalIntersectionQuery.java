@@ -24,21 +24,47 @@ import org.apache.lucene.search.NumericRangeQuery;
 /**
  * Query that finds intervals that intersect with the given interval.
  */
-public class NumericIntervalIntersectionQuery extends BooleanQuery {
+public final class NumericIntervalIntersectionQuery extends BooleanQuery {
+  /**
+   * The start of the interval.
+   */
   private final long start;
+
+  /**
+   * The end of the interval.
+   */
   private final long end;
 
-  public NumericIntervalIntersectionQuery(String name, long start, long end) {
+  /**
+   * Creates a new numeric interval intersection query.
+   * @param name The name of the field to search against.
+   * @param start The start of the interval to intersect with.
+   * @param end The end of the interval to intersect with.
+   */
+  public NumericIntervalIntersectionQuery(final String name,
+                                          final long start,
+                                          final long end) {
     this(name, start, end, NumericIntervalField.DEFAULT_PRECISION_STEP);
   }
 
-  public NumericIntervalIntersectionQuery(String name, long start, long end, int precisionStep) {
+  /**
+   * Creates a new numeric interval intersection query.
+   * @param name The name of the field to search against.
+   * @param start The start of the interval to intersect with.
+   * @param end The end of the interval to intersect with.
+   * @param precisionStep The precision step used when indexing the intervals.
+   */
+  public NumericIntervalIntersectionQuery(final String name,
+                                          final long start,
+                                          final long end,
+                                          final int precisionStep) {
     super(true);
     this.start = start;
     this.end = end;
 
     this.add(
-        NumericRangeQuery.newLongRange(name, precisionStep, start, end, true, true),
+        NumericRangeQuery.newLongRange(
+            name, precisionStep, start, end, true, true),
         BooleanClause.Occur.SHOULD);
     this.add(
         new InNumericIntervalQuery(name, end, precisionStep),
@@ -49,7 +75,7 @@ public class NumericIntervalIntersectionQuery extends BooleanQuery {
   }
 
   @Override
-  public String toString(String field) {
+  public String toString(final String field) {
     return String.format("intersectsInterval(%d - %d, %s)", start, end, field);
   }
 
@@ -59,9 +85,9 @@ public class NumericIntervalIntersectionQuery extends BooleanQuery {
   }
 
   @Override
-  public boolean equals(Object o) {
-    return o != null && o.getClass() == this.getClass() &&
-        ((NumericIntervalIntersectionQuery) o).start == start &&
-        ((NumericIntervalIntersectionQuery) o).end == end;
+  public boolean equals(final Object o) {
+    return o != null && o.getClass() == this.getClass()
+        && ((NumericIntervalIntersectionQuery) o).start == start
+        && ((NumericIntervalIntersectionQuery) o).end == end;
   }
 }
