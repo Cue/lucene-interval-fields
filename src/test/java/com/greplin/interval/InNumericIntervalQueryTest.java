@@ -31,6 +31,10 @@ public class InNumericIntervalQueryTest extends BaseIntervalQueryTest {
 
   private static final Pair<Long, Long> EDGE = Pair.of(1257642240L, 1257645568L);
 
+  private static final Pair<Long, Long> NEGATIVE = Pair.of(-100L, -50L);
+
+  private static final Pair<Long, Long> ACROSS_ZERO = Pair.of(-80L, 80L);
+
   @Test
   public void testBasics() throws IOException {
     addDocument(1, EXAMPLE);
@@ -62,6 +66,27 @@ public class InNumericIntervalQueryTest extends BaseIntervalQueryTest {
   }
 
   @Test
+  public void testNegative() throws IOException {
+    addDocument(3, NEGATIVE);
+    addDocument(4, ACROSS_ZERO);
+
+    Searcher searcher = getSearcher();
+    assertSearch(searcher, -1000);
+    assertSearch(searcher, 1000);
+
+    assertSearch(searcher, -101);
+    assertSearch(searcher, -100, 3);
+    assertSearch(searcher, -80, 3, 4);
+    assertSearch(searcher, -50, 3, 4);
+    assertSearch(searcher, -49, 4);
+    assertSearch(searcher, -1, 4);
+    assertSearch(searcher, 0, 4);
+    assertSearch(searcher, 1, 4);
+    assertSearch(searcher, 80, 4);
+    assertSearch(searcher, 81);
+  }
+
+  @Test
   public void testMultiple() throws IOException {
     addDocument(1, EXAMPLE);
     addDocument(2, EDGE);
@@ -78,6 +103,7 @@ public class InNumericIntervalQueryTest extends BaseIntervalQueryTest {
     assertSearch(searcher, 1257645600, 1);
     assertSearch(searcher, 1257645601);
   }
+
 
   private void assertSearch(Searcher searcher, long value, Integer... expectedResults) throws IOException {
     assertSearch(searcher, new InNumericIntervalQuery("time", value), expectedResults);
