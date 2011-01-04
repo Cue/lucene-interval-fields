@@ -117,7 +117,7 @@ public final class NumericIntervalField extends AbstractField {
   public static NumericIntervalField fromString(final String name,
                                                 final boolean index,
                                                 final String rangeString) {
-    String[] parts = rangeString.split("-");
+    String[] parts = rangeString.split(":");
     return new NumericIntervalField(
         name,
         index,
