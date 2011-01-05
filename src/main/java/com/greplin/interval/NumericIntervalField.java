@@ -16,6 +16,7 @@
 
 package com.greplin.interval;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.sun.tools.javac.util.Pair;
 import org.apache.lucene.analysis.TokenStream;
@@ -107,6 +108,21 @@ public final class NumericIntervalField extends AbstractField {
     return this.isIndexed() ? tokenStreamValue : null;
   }
 
+
+  /**
+   * Splits a numeric range string in to the two numbers comprising it.
+   * @param rangeString the range string
+   * @return array of two numbers
+   */
+  @VisibleForTesting
+  static long[] splitParts(final String rangeString) {
+    String trimmed = rangeString.trim();
+    int middle = trimmed.indexOf('-', 1);
+    long start = Long.parseLong(trimmed.substring(0, middle).trim());
+    long end = Long.parseLong(trimmed.substring(middle + 1).trim());
+    return new long[]{start, end};
+  }
+
   /**
    * Creates a numeric interval field from a string format.
    * @param name The name of the field to index.
@@ -117,11 +133,7 @@ public final class NumericIntervalField extends AbstractField {
   public static NumericIntervalField fromString(final String name,
                                                 final boolean index,
                                                 final String rangeString) {
-    String[] parts = rangeString.split(":");
-    return new NumericIntervalField(
-        name,
-        index,
-        Long.parseLong(parts[0].trim()),
-        Long.parseLong(parts[1].trim()));
+    long[] parts = splitParts(rangeString);
+    return new NumericIntervalField(name, index, parts[0], parts[1]);
   }
 }
