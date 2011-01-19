@@ -18,7 +18,6 @@ package com.greplin.interval;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
-import com.sun.tools.javac.util.Pair;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.document.AbstractField;
 import org.apache.lucene.document.Field;
@@ -76,19 +75,19 @@ public final class NumericIntervalField extends AbstractField {
         Field.TermVector.NO);
     setOmitTermFreqAndPositions(true);
 
-    final ImmutableList.Builder<Pair<Long, Integer>> segmentsBuilder =
+    final ImmutableList.Builder<IntervalSegment> segmentsBuilder =
         ImmutableList.builder();
     NumericUtils.splitLongRange(new NumericUtils.LongRangeBuilder() {
       @Override
       public void addRange(final long min, final long max, final int shift) {
         long currentMinimum = min;
         while (currentMinimum <= max) {
-          segmentsBuilder.add(Pair.of(currentMinimum, shift));
+          segmentsBuilder.add(new IntervalSegment(currentMinimum, shift));
           currentMinimum += 1 << shift;
         }
       }
     }, precisionStep, min, max);
-    ImmutableList<Pair<Long, Integer>> segments = segmentsBuilder.build();
+    ImmutableList<IntervalSegment> segments = segmentsBuilder.build();
 
     tokenStreamValue = new NumericIntervalTokenStream(segments);
   }

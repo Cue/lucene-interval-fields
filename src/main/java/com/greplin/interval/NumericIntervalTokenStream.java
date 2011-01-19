@@ -17,7 +17,6 @@
 package com.greplin.interval;
 
 import com.google.common.collect.ImmutableList;
-import com.sun.tools.javac.util.Pair;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.TermAttribute;
 import org.apache.lucene.util.NumericUtils;
@@ -33,7 +32,7 @@ final class NumericIntervalTokenStream
   /**
    * Segments that make up the interval.
    */
-  private final ImmutableList<Pair<Long, Integer>> segments;
+  private final ImmutableList<IntervalSegment> segments;
 
   /**
    * The term attribute.
@@ -50,7 +49,7 @@ final class NumericIntervalTokenStream
    * @param segments The segments.
    */
   public NumericIntervalTokenStream(
-      final ImmutableList<Pair<Long, Integer>> segments) {
+      final ImmutableList<IntervalSegment> segments) {
     super();
     this.segments = segments;
   }
@@ -67,9 +66,9 @@ final class NumericIntervalTokenStream
     }
 
     clearAttributes();
-    Pair<Long, Integer> interval = segments.get(i);
-    long value = interval.fst;
-    int shift = interval.snd;
+    IntervalSegment interval = segments.get(i);
+    long value = interval.getStart();
+    int shift = interval.getShift();
     final char[] buffer = termAtt.resizeTermBuffer(NumericUtils.BUF_SIZE_LONG);
     termAtt.setTermLength(NumericUtils.longToPrefixCoded(value, shift, buffer));
     i++;

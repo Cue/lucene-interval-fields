@@ -16,7 +16,6 @@
 
 package com.greplin.interval;
 
-import com.sun.tools.javac.util.Pair;
 import org.apache.lucene.search.Searcher;
 import org.junit.Test;
 
@@ -27,13 +26,13 @@ import java.io.IOException;
  */
 public class InNumericIntervalQueryTest extends BaseIntervalQueryTest {
 
-  private static final Pair<Long, Long> EXAMPLE = Pair.of(1257642000L, 1257645600L);
+  private static final Interval<Long> EXAMPLE = new Interval<Long>(1257642000L, 1257645600L);
 
-  private static final Pair<Long, Long> EDGE = Pair.of(1257642240L, 1257645568L);
+  private static final Interval<Long> EDGE = new Interval<Long>(1257642240L, 1257645568L);
 
-  private static final Pair<Long, Long> NEGATIVE = Pair.of(-100L, -50L);
+  private static final Interval<Long> NEGATIVE = new Interval<Long>(-100L, -50L);
 
-  private static final Pair<Long, Long> ACROSS_ZERO = Pair.of(-80L, 80L);
+  private static final Interval<Long> ACROSS_ZERO = new Interval<Long>(-80L, 80L);
 
   @Test
   public void testBasics() throws IOException {

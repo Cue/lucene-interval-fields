@@ -18,7 +18,6 @@ package com.greplin.interval;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
-import com.sun.tools.javac.util.Pair;
 import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -47,8 +46,8 @@ public abstract class BaseIntervalQueryTest {
     indexWriter = new IndexWriter(ramDirectory, new SimpleAnalyzer(), true, IndexWriter.MaxFieldLength.UNLIMITED);
   }
 
-  protected void addDocument(int id, Pair<Long, Long> pair) throws IOException {
-    addDocument(id, pair.fst, pair.snd);
+  protected void addDocument(int id, Interval<Long> interval) throws IOException {
+    addDocument(id, interval.getStart(), interval.getEnd());
   }
 
   protected void addDocument(int id, long start, long end) throws IOException {
