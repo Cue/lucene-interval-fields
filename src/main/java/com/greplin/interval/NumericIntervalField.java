@@ -83,7 +83,7 @@ public final class NumericIntervalField extends AbstractField {
         long currentMinimum = min;
         while (currentMinimum <= max) {
           segmentsBuilder.add(new IntervalSegment(currentMinimum, shift));
-          currentMinimum += 1 << shift;
+          currentMinimum += 1L << shift;
         }
       }
     }, precisionStep, min, max);

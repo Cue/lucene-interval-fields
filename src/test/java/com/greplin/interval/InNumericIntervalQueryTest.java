@@ -30,6 +30,8 @@ public class InNumericIntervalQueryTest extends BaseIntervalQueryTest {
 
   private static final Interval<Long> EDGE = new Interval<Long>(1257642240L, 1257645568L);
 
+  private static final Interval<Long> NEGATIVE_EDGE = new Interval<Long>(-8589934592L, -1L);
+
   private static final Interval<Long> NEGATIVE = new Interval<Long>(-100L, -50L);
 
   private static final Interval<Long> ACROSS_ZERO = new Interval<Long>(-80L, 80L);
@@ -68,17 +70,18 @@ public class InNumericIntervalQueryTest extends BaseIntervalQueryTest {
   public void testNegative() throws IOException {
     addDocument(3, NEGATIVE);
     addDocument(4, ACROSS_ZERO);
+    addDocument(5, NEGATIVE_EDGE);
 
     Searcher searcher = getSearcher();
-    assertSearch(searcher, -1000);
+    assertSearch(searcher, -1000, 5);
     assertSearch(searcher, 1000);
 
-    assertSearch(searcher, -101);
-    assertSearch(searcher, -100, 3);
-    assertSearch(searcher, -80, 3, 4);
-    assertSearch(searcher, -50, 3, 4);
-    assertSearch(searcher, -49, 4);
-    assertSearch(searcher, -1, 4);
+    assertSearch(searcher, -101, 5);
+    assertSearch(searcher, -100, 3, 5);
+    assertSearch(searcher, -80, 3, 4, 5);
+    assertSearch(searcher, -50, 3, 4, 5);
+    assertSearch(searcher, -49, 4, 5);
+    assertSearch(searcher, -1, 4, 5);
     assertSearch(searcher, 0, 4);
     assertSearch(searcher, 1, 4);
     assertSearch(searcher, 80, 4);
