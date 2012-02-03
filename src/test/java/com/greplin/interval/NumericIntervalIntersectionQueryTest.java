@@ -48,16 +48,35 @@ public class NumericIntervalIntersectionQueryTest extends BaseIntervalQueryTest 
   }
 
   @Test
-  public void testContainmentWithLowPrecisionInterval() throws IOException {
+  public void testLowPrecisionIntervals() throws IOException {
     // Regression test: this previously failed because 0 - 4096 and other
     // large ranges can skip over smaller contained ranges.  For example,
     // 0 - 4096 => (start:0, shift:12)
     // and
     // 900 - 110 => (start:16, shift: 4)
 
-    addDocument(1, 16, 32);
+    addDocument(10, 0, 16);
+    addDocument(11, 16, 32);
+    addDocument(12, 4064, 4080);
+    addDocument(13, 4080, 4096);
 
-    assertSearch(getSearcher(), 0, 4096, 1);
+    addDocument(20, 0, 256);
+    addDocument(21, 256, 512);
+    addDocument(22, 3584, 3840);
+    addDocument(23, 3840, 4096);
+
+    for (int i = 0; i < 100; i++) {
+      // Add a bunch of garbage.
+      addDocument(100 + i, 10000 + 11 * i, 10000 + 12 * i);
+      addDocument(200 + i, -10000 + 11 * i, -10000 + 12 * i);
+    }
+
+    assertSearch(getSearcher(), 0, 4096, 10, 11, 12, 13, 20, 21, 22, 23);
+    assertSearch(getSearcher(), 0, 256, 10, 11, 20, 21);
+    assertSearch(getSearcher(), 0, 16, 10, 11, 20);
+
+    assertSearch(getSearcher(), 3840, 4096, 12, 13, 22, 23);
+    assertSearch(getSearcher(), 4080, 4096, 12, 13, 23);
   }
 
   protected void assertSearch(Searcher searcher, long start, long end, Integer... expectedResults)

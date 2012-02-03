@@ -44,6 +44,11 @@ public final class NumericIntervalIntersectionQuery extends MultiTermQuery {
    */
   private final long end;
 
+  /**
+   * The precision step used when indexing the field.
+   */
+  private final int precisionStep;
+
 
   /**
    * Creates a new numeric sub-interval query.
@@ -72,7 +77,7 @@ public final class NumericIntervalIntersectionQuery extends MultiTermQuery {
     this.name = name.intern();
     this.start = start;
     this.end = end;
-    // TODO: Use precisionStep to skip over useless intervals in the TermEnum.
+    this.precisionStep = precisionStep;
     setRewriteMethod(MultiTermQuery.CONSTANT_SCORE_FILTER_REWRITE);
   }
 
@@ -104,15 +109,54 @@ public final class NumericIntervalIntersectionQuery extends MultiTermQuery {
 
 
     /**
+     * Whether to skip to the next precision value next time.
+     */
+    private boolean skip = false;
+
+
+    /**
+     * The current shift value.
+     */
+    private int shift = 0;
+
+
+    /**
+     * The Index Reader we are reading terms from.
+     */
+    private final IndexReader reader;
+
+
+    /**
      * Creates a term enum matching intersected interval segments.
      * @param reader the index to filter terms from
      * @throws IOException if IO issues occur
      */
     private NumericIntervalIntersectionTermEnum(final IndexReader reader)
         throws IOException {
-      setEnum(reader.terms(new Term(NumericIntervalIntersectionQuery.this.name,
+      this.reader = reader;
+      setEnum(reader.terms(new Term(
+          NumericIntervalIntersectionQuery.this.name,
           NumericUtils.longToPrefixCoded(
               NumericIntervalIntersectionQuery.this.start))));
+    }
+
+
+    @Override
+    public boolean next() throws IOException {
+      if (skip) {
+        skip = false;
+        shift += precisionStep;
+
+        currentTerm = null;
+        setEnum(this.reader.terms(new Term(
+            NumericIntervalIntersectionQuery.this.name,
+            NumericUtils.longToPrefixCoded(
+                NumericIntervalIntersectionQuery.this.start, shift)
+        )));
+        return currentTerm != null;
+      } else {
+        return super.next();
+      }
     }
 
 
@@ -127,7 +171,7 @@ public final class NumericIntervalIntersectionQuery extends MultiTermQuery {
       final int shift = term.text().charAt(0) - NumericUtils.SHIFT_START_LONG;
       final long startOfRange = NumericUtils.prefixCodedToLong(term.text());
       final long endOfRange = startOfRange + (1 << shift) - 1;
-      return
+      final boolean result =
           // The query interval contains the start of the indexed.
           (startOfRange >= NumericIntervalIntersectionQuery.this.start
            && startOfRange <= NumericIntervalIntersectionQuery.this.end)
@@ -144,6 +188,9 @@ public final class NumericIntervalIntersectionQuery extends MultiTermQuery {
           // The query interval is contained in the indexed interval.
           (startOfRange <= NumericIntervalIntersectionQuery.this.start
            && endOfRange >= NumericIntervalIntersectionQuery.this.end);
+
+      skip = !result;
+      return result;
     }
 
 
