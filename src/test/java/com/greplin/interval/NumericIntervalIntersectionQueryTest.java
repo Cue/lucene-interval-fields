@@ -17,7 +17,6 @@
 package com.greplin.interval;
 
 import org.apache.lucene.search.Searcher;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -27,16 +26,11 @@ import java.io.IOException;
  */
 public class NumericIntervalIntersectionQueryTest extends BaseIntervalQueryTest {
 
-  @Before
-  @Override
-  public void setUp() throws IOException {
-    super.setUp();
-    addDocument(1, 1000, 2000);
-    addDocument(2, 900, 1100);
-  }
-
   @Test
   public void testBasics() throws IOException {
+    addDocument(1, 1000, 2000);
+    addDocument(2, 900, 1100);
+
     Searcher searcher = getSearcher();
 
     assertSearch(searcher, 800, 2200, 1, 2);
@@ -51,6 +45,19 @@ public class NumericIntervalIntersectionQueryTest extends BaseIntervalQueryTest 
     assertSearch(searcher, 1, 899);
     assertSearch(searcher, 898, 899);
     assertSearch(searcher, 1500, 1550, 1);
+  }
+
+  @Test
+  public void testContainmentWithLowPrecisionInterval() throws IOException {
+    // Regression test: this previously failed because 0 - 4096 and other
+    // large ranges can skip over smaller contained ranges.  For example,
+    // 0 - 4096 => (start:0, shift:12)
+    // and
+    // 900 - 110 => (start:16, shift: 4)
+
+    addDocument(1, 16, 32);
+
+    assertSearch(getSearcher(), 0, 4096, 1);
   }
 
   protected void assertSearch(Searcher searcher, long start, long end, Integer... expectedResults)

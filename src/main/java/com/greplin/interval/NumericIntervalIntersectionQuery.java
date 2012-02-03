@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 The Lucene Interval Field Authors.
+ * Copyright 2012 The Lucene Interval Field Authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,24 @@
 
 package com.greplin.interval;
 
-import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.apache.lucene.search.BooleanClause;
-import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.NumericRangeQuery;
+import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.search.FilteredTermEnum;
+import org.apache.lucene.search.MultiTermQuery;
+import org.apache.lucene.util.NumericUtils;
+
+import java.io.IOException;
 
 /**
- * Query that finds intervals that intersect with the given interval.
+ * Query that matches intervals partially contained by the given interval.
  */
-public final class NumericIntervalIntersectionQuery extends BooleanQuery {
+public final class NumericIntervalIntersectionQuery extends MultiTermQuery {
+
+  /**
+   * The name of the field.
+   */
+  private final String name;
+
   /**
    * The start of the interval.
    */
@@ -35,11 +44,12 @@ public final class NumericIntervalIntersectionQuery extends BooleanQuery {
    */
   private final long end;
 
+
   /**
-   * Creates a new numeric interval intersection query.
-   * @param name The name of the field to search against.
-   * @param start The start of the interval to intersect with.
-   * @param end The end of the interval to intersect with.
+   * Creates a new numeric sub-interval query.
+   * @param name The name of the field.
+   * @param start The start of the interval to find sub-intervals in.
+   * @param end The end of the interval to find sub-intervals in.
    */
   public NumericIntervalIntersectionQuery(final String name,
                                           final long start,
@@ -47,47 +57,105 @@ public final class NumericIntervalIntersectionQuery extends BooleanQuery {
     this(name, start, end, NumericIntervalField.DEFAULT_PRECISION_STEP);
   }
 
+
   /**
-   * Creates a new numeric interval intersection query.
-   * @param name The name of the field to search against.
-   * @param start The start of the interval to intersect with.
-   * @param end The end of the interval to intersect with.
-   * @param precisionStep The precision step used when indexing the intervals.
+   * Creates a new numeric sub-interval query.
+   * @param name The name of the field.
+   * @param start The start of the interval to find sub-intervals in.
+   * @param end The end of the interval to find sub-intervals in.
+   * @param precisionStep The precision step used when indexing the field.
    */
   public NumericIntervalIntersectionQuery(final String name,
                                           final long start,
                                           final long end,
                                           final int precisionStep) {
-    super(true);
+    this.name = name.intern();
     this.start = start;
     this.end = end;
-
-    this.add(
-        NumericRangeQuery.newLongRange(
-            name, precisionStep, start, end, true, true),
-        BooleanClause.Occur.SHOULD);
-    this.add(
-        new InNumericIntervalQuery(name, end, precisionStep),
-        BooleanClause.Occur.SHOULD);
-    this.add(
-        new InNumericIntervalQuery(name, start, precisionStep),
-        BooleanClause.Occur.SHOULD);
+    // TODO: Use precisionStep to skip over useless intervals in the TermEnum.
+    setRewriteMethod(MultiTermQuery.CONSTANT_SCORE_FILTER_REWRITE);
   }
+
+
+  @Override
+  protected FilteredTermEnum getEnum(final IndexReader reader)
+      throws IOException {
+    return new NumericIntervalIntersectionTermEnum(reader);
+  }
+
 
   @Override
   public String toString(final String field) {
-    return String.format("intersectsInterval(%d - %d, %s)", start, end, field);
+    return String.format("containedInInterval(%d - %d, %s)",
+        start, end, field);
   }
 
-  @Override
-  public int hashCode() {
-    return new HashCodeBuilder().append(start).append(end).hashCode();
-  }
 
-  @Override
-  public boolean equals(final Object o) {
-    return o != null && o.getClass() == this.getClass()
-        && ((NumericIntervalIntersectionQuery) o).start == start
-        && ((NumericIntervalIntersectionQuery) o).end == end;
+  /**
+   * Filtered TermEnum that returns terms that intersect this interval.
+   */
+  private final class NumericIntervalIntersectionTermEnum
+      extends FilteredTermEnum {
+
+    /**
+     * Whether to end the enumeration at the next opportunity.
+     */
+    private boolean endEnum = false;
+
+
+    /**
+     * Creates a term enum matching intersected interval segments.
+     * @param reader the index to filter terms from
+     * @throws IOException if IO issues occur
+     */
+    private NumericIntervalIntersectionTermEnum(final IndexReader reader)
+        throws IOException {
+      setEnum(reader.terms(new Term(NumericIntervalIntersectionQuery.this.name,
+          NumericUtils.longToPrefixCoded(
+              NumericIntervalIntersectionQuery.this.start))));
+    }
+
+
+    @Override
+    protected boolean termCompare(final Term term) {
+      if (term.field() != NumericIntervalIntersectionQuery.this.name) {
+        endEnum = true;
+        return false;
+      }
+
+      // Taken from NumericUtils.prefixCodedToLong
+      final int shift = term.text().charAt(0) - NumericUtils.SHIFT_START_LONG;
+      final long startOfRange = NumericUtils.prefixCodedToLong(term.text());
+      final long endOfRange = startOfRange + (1 << shift) - 1;
+      return
+          // The query interval contains the start of the indexed.
+          (startOfRange >= NumericIntervalIntersectionQuery.this.start
+           && startOfRange <= NumericIntervalIntersectionQuery.this.end)
+
+          ||
+
+          // The query interval contains the start of the indexed.
+          (endOfRange >= NumericIntervalIntersectionQuery.this.start
+           && endOfRange <= NumericIntervalIntersectionQuery.this.end)
+
+
+          ||
+
+          // The query interval is contained in the indexed interval.
+          (startOfRange <= NumericIntervalIntersectionQuery.this.start
+           && endOfRange >= NumericIntervalIntersectionQuery.this.end);
+    }
+
+
+    @Override
+    public float difference() {
+      return 1.0f; // Just used as a boost and we don't care about scores.
+    }
+
+
+    @Override
+    protected boolean endEnum() {
+      return endEnum;
+    }
   }
 }
