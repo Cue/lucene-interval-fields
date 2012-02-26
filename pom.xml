@@ -54,7 +54,7 @@
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
-      <version>r09</version>
+      <version>11.0</version>
     </dependency>
     <dependency>
       <groupId>net.sf.json-lib</groupId>
