@@ -16,18 +16,21 @@
 
 package com.greplin.interval;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.Searcher;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.RAMDirectory;
+import org.apache.lucene.util.Version;
 import org.junit.Assert;
 import org.junit.Before;
 
@@ -43,7 +46,9 @@ public abstract class BaseIntervalQueryTest {
   @Before
   public void setUp() throws IOException {
     RAMDirectory ramDirectory = new RAMDirectory();
-    indexWriter = new IndexWriter(ramDirectory, new SimpleAnalyzer(), true, IndexWriter.MaxFieldLength.UNLIMITED);
+    IndexWriterConfig config = new IndexWriterConfig(
+        Version.LUCENE_35, new SimpleAnalyzer(Version.LUCENE_35));
+    this.indexWriter = new IndexWriter(ramDirectory, config);
   }
 
   protected void addDocument(int id, Interval<Long> interval) throws IOException {
@@ -54,14 +59,14 @@ public abstract class BaseIntervalQueryTest {
     Document doc1 = new Document();
     doc1.add(new Field("id", String.valueOf(id), Field.Store.YES, Field.Index.NO));
     doc1.add(new NumericIntervalField("time", true, start, end));
-    indexWriter.addDocument(doc1);
+    this.indexWriter.addDocument(doc1);
   }
 
-  protected Searcher getSearcher() throws IOException {
-    return new IndexSearcher(indexWriter.getReader());
+  protected IndexSearcher getSearcher() throws IOException {
+    return new IndexSearcher(IndexReader.open(this.indexWriter, true));
   }
 
-  protected void assertSearch(Searcher searcher, Query query, Integer... expectedResults)
+  protected void assertSearch(IndexSearcher searcher, Query query, Integer... expectedResults)
       throws IOException {
     Set<Integer> expected = ImmutableSet.copyOf(expectedResults);
 
@@ -72,6 +77,6 @@ public abstract class BaseIntervalQueryTest {
       actual.add(Integer.valueOf(doc.get("id")));
     }
 
-    Assert.assertEquals(query + " should match " + expectedResults.toString(), expected, actual);
+    Assert.assertEquals(query + " should match [" + Joiner.on(", ").join(expectedResults) + "]", expected, actual);
   }
 }

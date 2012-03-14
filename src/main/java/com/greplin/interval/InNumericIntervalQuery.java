@@ -78,18 +78,18 @@ public final class InNumericIntervalQuery extends BooleanQuery {
 
   @Override
   public String toString(final String field) {
-    return String.format("inInterval(%d, %s)", value, field);
+    return String.format("inInterval(%d, %s)", this.value, field);
   }
 
   @Override
   public int hashCode() {
-    return (int) value;
+    return (int) this.value;
   }
 
   @Override
   public boolean equals(final Object o) {
     return o != null
         && o.getClass() == this.getClass()
-        && ((InNumericIntervalQuery) o).value == value;
+        && ((InNumericIntervalQuery) o).value == this.value;
   }
 }

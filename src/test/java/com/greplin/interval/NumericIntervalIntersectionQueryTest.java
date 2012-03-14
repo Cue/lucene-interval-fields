@@ -16,7 +16,7 @@
 
 package com.greplin.interval;
 
-import org.apache.lucene.search.Searcher;
+import org.apache.lucene.search.IndexSearcher;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -31,7 +31,7 @@ public class NumericIntervalIntersectionQueryTest extends BaseIntervalQueryTest 
     addDocument(1, 1000, 2000);
     addDocument(2, 900, 1100);
 
-    Searcher searcher = getSearcher();
+    IndexSearcher searcher = getSearcher();
 
     assertSearch(searcher, 800, 2200, 1, 2);
     assertSearch(searcher, 1000, 2200, 1, 2);
@@ -79,7 +79,7 @@ public class NumericIntervalIntersectionQueryTest extends BaseIntervalQueryTest 
     assertSearch(getSearcher(), 4080, 4096, 12, 13, 23);
   }
 
-  protected void assertSearch(Searcher searcher, long start, long end, Integer... expectedResults)
+  protected void assertSearch(IndexSearcher searcher, long start, long end, Integer... expectedResults)
       throws IOException {
     assertSearch(searcher, new NumericIntervalIntersectionQuery("time", start, end), expectedResults);
   }

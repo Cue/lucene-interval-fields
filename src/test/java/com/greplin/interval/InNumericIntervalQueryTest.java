@@ -16,7 +16,7 @@
 
 package com.greplin.interval;
 
-import org.apache.lucene.search.Searcher;
+import org.apache.lucene.search.IndexSearcher;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -40,7 +40,7 @@ public class InNumericIntervalQueryTest extends BaseIntervalQueryTest {
   public void testBasics() throws IOException {
     addDocument(1, EXAMPLE);
 
-    Searcher searcher = getSearcher();
+    IndexSearcher searcher = getSearcher();
     assertSearch(searcher, 1257600000);
     assertSearch(searcher, 1257641999);
     assertSearch(searcher, 1257642000, 1);
@@ -53,7 +53,7 @@ public class InNumericIntervalQueryTest extends BaseIntervalQueryTest {
   public void testEdge() throws IOException {
     addDocument(2, EDGE);
 
-    Searcher searcher = getSearcher();
+    IndexSearcher searcher = getSearcher();
     assertSearch(searcher, 1257600000);
     assertSearch(searcher, 1257641999);
     assertSearch(searcher, 1257642000);
@@ -72,7 +72,7 @@ public class InNumericIntervalQueryTest extends BaseIntervalQueryTest {
     addDocument(4, ACROSS_ZERO);
     addDocument(5, NEGATIVE_EDGE);
 
-    Searcher searcher = getSearcher();
+    IndexSearcher searcher = getSearcher();
     assertSearch(searcher, -1000, 5);
     assertSearch(searcher, 1000);
 
@@ -93,7 +93,7 @@ public class InNumericIntervalQueryTest extends BaseIntervalQueryTest {
     addDocument(1, EXAMPLE);
     addDocument(2, EDGE);
 
-    Searcher searcher = getSearcher();
+    IndexSearcher searcher = getSearcher();
     assertSearch(searcher, 1257600000);
     assertSearch(searcher, 1257641999);
     assertSearch(searcher, 1257642000, 1);
@@ -107,7 +107,7 @@ public class InNumericIntervalQueryTest extends BaseIntervalQueryTest {
   }
 
 
-  private void assertSearch(Searcher searcher, long value, Integer... expectedResults) throws IOException {
+  private void assertSearch(IndexSearcher searcher, long value, Integer... expectedResults) throws IOException {
     assertSearch(searcher, new InNumericIntervalQuery("time", value), expectedResults);
   }
 }

@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableList;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.document.AbstractField;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.index.FieldInfo;
 import org.apache.lucene.util.NumericUtils;
 
 import java.io.Reader;
@@ -73,7 +74,7 @@ public final class NumericIntervalField extends AbstractField {
         Field.Store.NO,
         index ? Field.Index.ANALYZED_NO_NORMS : Field.Index.NO,
         Field.TermVector.NO);
-    setOmitTermFreqAndPositions(true);
+    setIndexOptions(FieldInfo.IndexOptions.DOCS_ONLY);
 
     final ImmutableList.Builder<IntervalSegment> segmentsBuilder =
         ImmutableList.builder();
@@ -89,7 +90,7 @@ public final class NumericIntervalField extends AbstractField {
     }, precisionStep, min, max);
     ImmutableList<IntervalSegment> segments = segmentsBuilder.build();
 
-    tokenStreamValue = new NumericIntervalTokenStream(segments);
+    this.tokenStreamValue = new NumericIntervalTokenStream(segments);
   }
 
   @Override
@@ -104,7 +105,7 @@ public final class NumericIntervalField extends AbstractField {
 
   @Override
   public TokenStream tokenStreamValue() {
-    return this.isIndexed() ? tokenStreamValue : null;
+    return this.isIndexed() ? this.tokenStreamValue : null;
   }
 
 
