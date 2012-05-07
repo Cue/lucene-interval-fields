@@ -26,15 +26,15 @@ import java.io.IOException;
  */
 public class InNumericIntervalQueryTest extends BaseIntervalQueryTest {
 
-  private static final Interval<Long> EXAMPLE = new Interval<Long>(1257642000L, 1257645600L);
+  private static final LongInterval EXAMPLE = new LongInterval(1257642000L, 1257645600L);
 
-  private static final Interval<Long> EDGE = new Interval<Long>(1257642240L, 1257645568L);
+  private static final LongInterval EDGE = new LongInterval(1257642240L, 1257645568L);
 
-  private static final Interval<Long> NEGATIVE_EDGE = new Interval<Long>(-8589934592L, -1L);
+  private static final LongInterval NEGATIVE_EDGE = new LongInterval(-8589934592L, -1L);
 
-  private static final Interval<Long> NEGATIVE = new Interval<Long>(-100L, -50L);
+  private static final LongInterval NEGATIVE = new LongInterval(-100L, -50L);
 
-  private static final Interval<Long> ACROSS_ZERO = new Interval<Long>(-80L, 80L);
+  private static final LongInterval ACROSS_ZERO = new LongInterval(-80L, 80L);
 
   @Test
   public void testBasics() throws IOException {

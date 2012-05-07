@@ -51,7 +51,7 @@ public abstract class BaseIntervalQueryTest {
     this.indexWriter = new IndexWriter(ramDirectory, config);
   }
 
-  protected void addDocument(int id, Interval<Long> interval) throws IOException {
+  protected void addDocument(int id, LongInterval interval) throws IOException {
     addDocument(id, interval.getStart(), interval.getEnd());
   }
 
