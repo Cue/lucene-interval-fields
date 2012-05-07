@@ -128,4 +128,13 @@ public class FloatInterval implements Comparable<FloatInterval> {
   public String toString() {
     return "FloatInterval{" + this.start + '-' + this.end + '}';
   }
+
+
+  /**
+   * @return this interval formatted as a string.
+   */
+  public String asString() {
+    return this.start + "-" + this.end;
+  }
+
 }

@@ -129,4 +129,12 @@ public class LongInterval implements Comparable<LongInterval> {
     return "LongInterval{" + this.start + '-' + this.end + '}';
   }
 
+
+  /**
+   * @return this interval formatted as a string.
+   */
+  public String asString() {
+    return this.start + "-" + this.end;
+  }
+
 }

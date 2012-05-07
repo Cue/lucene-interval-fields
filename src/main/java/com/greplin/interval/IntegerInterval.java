@@ -129,4 +129,12 @@ public class IntegerInterval implements Comparable<IntegerInterval> {
     return "IntegerInterval{" + this.start + '-' + this.end + '}';
   }
 
+
+  /**
+   * @return this interval formatted as a string.
+   */
+  public String asString() {
+    return this.start + "-" + this.end;
+  }
+
 }
