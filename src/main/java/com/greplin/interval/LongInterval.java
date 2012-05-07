@@ -123,4 +123,10 @@ public class LongInterval implements Comparable<LongInterval> {
     return Longs.compare(this.start, other.start);
   }
 
+
+  @Override
+  public String toString() {
+    return "LongInterval{" + this.start + '-' + this.end + '}';
+  }
+
 }

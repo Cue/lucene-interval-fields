@@ -123,4 +123,9 @@ public class FloatInterval implements Comparable<FloatInterval> {
     return Floats.compare(this.start, other.start);
   }
 
+
+  @Override
+  public String toString() {
+    return "FloatInterval{" + this.start + '-' + this.end + '}';
+  }
 }

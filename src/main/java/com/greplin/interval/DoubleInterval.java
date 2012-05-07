@@ -123,4 +123,10 @@ public class DoubleInterval implements Comparable<DoubleInterval> {
     return Doubles.compare(this.start, other.start);
   }
 
+
+  @Override
+  public String toString() {
+    return "DoubleInterval{" + this.start + '-' + this.end + '}';
+  }
+
 }

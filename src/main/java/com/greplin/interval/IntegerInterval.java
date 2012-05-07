@@ -123,4 +123,10 @@ public class IntegerInterval implements Comparable<IntegerInterval> {
     return Ints.compare(this.start, other.getStart());
   }
 
+
+  @Override
+  public String toString() {
+    return "IntegerInterval{" + this.start + '-' + this.end + '}';
+  }
+
 }
