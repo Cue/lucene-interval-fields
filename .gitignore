@@ -1,3 +1,4 @@
 # Java specific
 target/
 *.class
+*.iml
