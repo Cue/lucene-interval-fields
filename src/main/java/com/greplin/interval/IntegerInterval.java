@@ -16,13 +16,15 @@
 
 package com.greplin.interval;
 
-import com.google.common.base.Objects;
 import com.google.common.primitives.Ints;
 
 /**
  * Represents an interval with integer values.
  */
-public class IntegerInterval implements Comparable<IntegerInterval> {
+public class IntegerInterval
+    extends NumericInterval<Integer>
+    implements Comparable<IntegerInterval> {
+
   /**
    * The start of the interval.
    */
@@ -58,6 +60,18 @@ public class IntegerInterval implements Comparable<IntegerInterval> {
    * @return the end of the interval
    */
   public final int getEnd() {
+    return this.end;
+  }
+
+
+  @Override
+  public Integer getBoxedStart() {
+    return this.start;
+  }
+
+
+  @Override
+  public Integer getBoxedEnd() {
     return this.end;
   }
 
@@ -99,42 +113,8 @@ public class IntegerInterval implements Comparable<IntegerInterval> {
 
 
   @Override
-  public boolean equals(final Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-
-    IntegerInterval interval = (IntegerInterval) o;
-    return this.end == interval.end && this.start == interval.start;
-  }
-
-
-  @Override
-  public int hashCode() {
-    return Objects.hashCode(this.start, this.end);
-  }
-
-
-  @Override
   public int compareTo(final IntegerInterval other) {
-    return Ints.compare(this.start, other.getStart());
-  }
-
-
-  @Override
-  public String toString() {
-    return "IntegerInterval{" + this.start + '-' + this.end + '}';
-  }
-
-
-  /**
-   * @return this interval formatted as a string.
-   */
-  public String asString() {
-    return this.start + "-" + this.end;
+    return Ints.compare(this.start, other.start);
   }
 
 }

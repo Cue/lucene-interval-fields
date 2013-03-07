@@ -16,13 +16,14 @@
 
 package com.greplin.interval;
 
-import com.google.common.base.Objects;
 import com.google.common.primitives.Longs;
 
 /**
  * Represents an interval with long values.
  */
-public class LongInterval implements Comparable<LongInterval> {
+public class LongInterval
+    extends NumericInterval<Long>
+    implements Comparable<LongInterval> {
   /**
    * The start of the interval.
    */
@@ -58,6 +59,18 @@ public class LongInterval implements Comparable<LongInterval> {
    * @return the end of the interval
    */
   public final long getEnd() {
+    return this.end;
+  }
+
+
+  @Override
+  public Long getBoxedStart() {
+    return this.start;
+  }
+
+
+  @Override
+  public Long getBoxedEnd() {
     return this.end;
   }
 
@@ -99,42 +112,8 @@ public class LongInterval implements Comparable<LongInterval> {
 
 
   @Override
-  public boolean equals(final Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-
-    LongInterval interval = (LongInterval) o;
-    return this.end == interval.end && this.start == interval.start;
-  }
-
-
-  @Override
-  public int hashCode() {
-    return Objects.hashCode(this.start, this.end);
-  }
-
-
-  @Override
   public int compareTo(final LongInterval other) {
     return Longs.compare(this.start, other.start);
-  }
-
-
-  @Override
-  public String toString() {
-    return "LongInterval{" + this.start + '-' + this.end + '}';
-  }
-
-
-  /**
-   * @return this interval formatted as a string.
-   */
-  public String asString() {
-    return this.start + "-" + this.end;
   }
 
 }

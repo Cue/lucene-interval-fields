@@ -16,13 +16,14 @@
 
 package com.greplin.interval;
 
-import com.google.common.base.Objects;
 import com.google.common.primitives.Floats;
 
 /**
  * Represents an interval with float values.
  */
-public class FloatInterval implements Comparable<FloatInterval> {
+public class FloatInterval
+    extends NumericInterval<Float>
+    implements Comparable<FloatInterval> {
   /**
    * The start of the interval.
    */
@@ -58,6 +59,18 @@ public class FloatInterval implements Comparable<FloatInterval> {
    * @return the end of the interval
    */
   public final float getEnd() {
+    return this.end;
+  }
+
+
+  @Override
+  public Float getBoxedStart() {
+    return this.start;
+  }
+
+
+  @Override
+  public Float getBoxedEnd() {
     return this.end;
   }
 
@@ -99,42 +112,8 @@ public class FloatInterval implements Comparable<FloatInterval> {
 
 
   @Override
-  public boolean equals(final Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-
-    FloatInterval interval = (FloatInterval) o;
-    return this.end == interval.end && this.start == interval.start;
-  }
-
-
-  @Override
-  public int hashCode() {
-    return Objects.hashCode(this.start, this.end);
-  }
-
-
-  @Override
   public int compareTo(final FloatInterval other) {
     return Floats.compare(this.start, other.start);
-  }
-
-
-  @Override
-  public String toString() {
-    return "FloatInterval{" + this.start + '-' + this.end + '}';
-  }
-
-
-  /**
-   * @return this interval formatted as a string.
-   */
-  public String asString() {
-    return this.start + "-" + this.end;
   }
 
 }

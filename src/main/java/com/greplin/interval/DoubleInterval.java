@@ -16,13 +16,14 @@
 
 package com.greplin.interval;
 
-import com.google.common.base.Objects;
 import com.google.common.primitives.Doubles;
 
 /**
  * Represents an interval with double values.
  */
-public class DoubleInterval implements Comparable<DoubleInterval> {
+public class DoubleInterval
+    extends NumericInterval<Double>
+    implements Comparable<DoubleInterval> {
   /**
    * The start of the interval.
    */
@@ -58,6 +59,18 @@ public class DoubleInterval implements Comparable<DoubleInterval> {
    * @return the end of the interval
    */
   public final double getEnd() {
+    return this.end;
+  }
+
+
+  @Override
+  public Double getBoxedStart() {
+    return this.start;
+  }
+
+
+  @Override
+  public Double getBoxedEnd() {
     return this.end;
   }
 
@@ -99,42 +112,8 @@ public class DoubleInterval implements Comparable<DoubleInterval> {
 
 
   @Override
-  public boolean equals(final Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-
-    DoubleInterval interval = (DoubleInterval) o;
-    return this.end == interval.end && this.start == interval.start;
-  }
-
-
-  @Override
-  public int hashCode() {
-    return Objects.hashCode(this.start, this.end);
-  }
-
-
-  @Override
   public int compareTo(final DoubleInterval other) {
     return Doubles.compare(this.start, other.start);
-  }
-
-
-  @Override
-  public String toString() {
-    return "DoubleInterval{" + this.start + '-' + this.end + '}';
-  }
-
-
-  /**
-   * @return this interval formatted as a string.
-   */
-  public String asString() {
-    return this.start + "-" + this.end;
   }
 
 }
