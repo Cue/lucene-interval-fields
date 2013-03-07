@@ -65,4 +65,13 @@ public abstract class NumericInterval<T extends Number> {
     return ImmutableList.of(this.getBoxedStart(), this.getBoxedEnd());
   }
 
+
+  /**
+   * @return this interval formatted as a 2 element list of strings.
+   */
+  public ImmutableList<String> asStringList() {
+    return ImmutableList.of(
+        this.getBoxedStart().toString(), this.getBoxedEnd().toString());
+  }
+
 }
