@@ -21,4 +21,12 @@ public class LongIntervalTest {
     assertParse("-2--1", -2, -1);
   }
 
+  @Test
+  public void testEquals() throws Exception {
+    Assert.assertEquals(new LongInterval(1, 100), new LongInterval(1, 100));
+    Assert.assertFalse(new LongInterval(1, 100).equals(new LongInterval(5, 100)));
+    Assert.assertFalse(new LongInterval(1, 100).equals(new LongInterval(1, 500)));
+    Assert.assertFalse(new LongInterval(1, 100).equals(new LongInterval(5, 500)));
+  }
+
 }
