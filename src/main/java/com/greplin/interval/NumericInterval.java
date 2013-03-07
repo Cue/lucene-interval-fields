@@ -33,7 +33,7 @@ public abstract class NumericInterval<T extends Number> {
 
     NumericInterval<T> interval = (NumericInterval<T>) o;
     return this.getBoxedEnd().equals(interval.getBoxedEnd())
-        && this.getBoxedStart().equals(interval.getBoxedEnd());
+        && this.getBoxedStart().equals(interval.getBoxedStart());
   }
 
 
