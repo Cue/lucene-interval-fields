@@ -56,40 +56,41 @@ final class NumericIntervalTokenStream
 
   @Override
   public void reset() {
-    i = 0;
+    this.i = 0;
   }
 
   @Override
   public boolean incrementToken() {
-    if (i >= segments.size()) {
+    if (this.i >= this.segments.size()) {
       return false;
     }
 
     clearAttributes();
-    IntervalSegment interval = segments.get(i);
+    IntervalSegment interval = this.segments.get(this.i);
     long value = interval.getStart();
     int shift = interval.getShift();
-    final char[] buffer = termAtt.resizeTermBuffer(NumericUtils.BUF_SIZE_LONG);
-    termAtt.setTermLength(NumericUtils.longToPrefixCoded(value, shift, buffer));
-    i++;
+    final char[] buffer =
+        this.termAtt.resizeTermBuffer(NumericUtils.BUF_SIZE_LONG);
+    this.termAtt.setTermLength(
+        NumericUtils.longToPrefixCoded(value, shift, buffer));
+    this.i++;
 
     return true;
   }
 
   @Override
   public String toString() {
-    return new StringBuilder("(interval,parts=").append(segments).append(')')
-        .toString();
+    return "(interval,parts=" + this.segments + ')';
   }
 
   @Override
   public int hashCode() {
-    return segments.hashCode();
+    return this.segments.hashCode();
   }
 
   @Override
   public boolean equals(final Object obj) {
     return obj != null && obj.getClass() == this.getClass()
-        && segments.equals(((NumericIntervalTokenStream) obj).segments);
+        && this.segments.equals(((NumericIntervalTokenStream) obj).segments);
   }
 }

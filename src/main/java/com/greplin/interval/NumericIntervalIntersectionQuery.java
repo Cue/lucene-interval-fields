@@ -92,7 +92,7 @@ public final class NumericIntervalIntersectionQuery extends MultiTermQuery {
   @Override
   public String toString(final String field) {
     return String.format("containedInInterval(%d - %d, %s)",
-        start, end, field);
+        this.start, this.end, field);
   }
 
 
@@ -143,17 +143,17 @@ public final class NumericIntervalIntersectionQuery extends MultiTermQuery {
 
     @Override
     public boolean next() throws IOException {
-      if (skip) {
-        skip = false;
-        shift += precisionStep;
+      if (this.skip) {
+        this.skip = false;
+        this.shift += NumericIntervalIntersectionQuery.this.precisionStep;
 
-        currentTerm = null;
+        this.currentTerm = null;
         setEnum(this.reader.terms(new Term(
             NumericIntervalIntersectionQuery.this.name,
             NumericUtils.longToPrefixCoded(
-                NumericIntervalIntersectionQuery.this.start, shift)
+                NumericIntervalIntersectionQuery.this.start, this.shift)
         )));
-        return currentTerm != null;
+        return this.currentTerm != null;
       } else {
         return super.next();
       }
@@ -163,7 +163,7 @@ public final class NumericIntervalIntersectionQuery extends MultiTermQuery {
     @Override
     protected boolean termCompare(final Term term) {
       if (term.field() != NumericIntervalIntersectionQuery.this.name) {
-        endEnum = true;
+        this.endEnum = true;
         return false;
       }
 
@@ -189,7 +189,7 @@ public final class NumericIntervalIntersectionQuery extends MultiTermQuery {
           (startOfRange <= NumericIntervalIntersectionQuery.this.start
            && endOfRange >= NumericIntervalIntersectionQuery.this.end);
 
-      skip = !result;
+      this.skip = !result;
       return result;
     }
 
@@ -202,7 +202,7 @@ public final class NumericIntervalIntersectionQuery extends MultiTermQuery {
 
     @Override
     protected boolean endEnum() {
-      return endEnum;
+      return this.endEnum;
     }
   }
 }

@@ -47,7 +47,7 @@ class IntervalSegment {
    * @return the start of the segment
    */
   public final long getStart() {
-    return start;
+    return this.start;
   }
 
 
@@ -56,6 +56,6 @@ class IntervalSegment {
    * @return the number of bits
    */
   public final int getShift() {
-    return shift;
+    return this.shift;
   }
 }
