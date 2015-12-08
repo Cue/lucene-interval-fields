@@ -105,9 +105,13 @@ public class LongInterval
   public static LongInterval valueOf(final String value) {
     String trimmed = value.trim();
     int middle = trimmed.indexOf('-', 1);
-    long start = Long.parseLong(trimmed.substring(0, middle).trim());
-    long end = Long.parseLong(trimmed.substring(middle + 1).trim());
-    return new LongInterval(start, end);
+    try {
+        long start = Long.parseLong(trimmed.substring(0, middle).trim());
+        long end = Long.parseLong(trimmed.substring(middle + 1).trim());
+        return new LongInterval(start, end);
+    } catch(NumberFormatException e) {
+        throw new NumberFormatException("Passed value does not contain two parsable long values");
+    }
   }
 
 

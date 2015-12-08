@@ -21,6 +21,11 @@ public class LongIntervalTest {
     assertParse("-2--1", -2, -1);
   }
 
+  @Test(expected=NumberFormatException.class)
+  public void testEmptyNumbers() throws Exception {
+    LongInterval result = LongInterval.valueOf("null-null");
+  }
+
   @Test
   public void testEquals() throws Exception {
     Assert.assertEquals(new LongInterval(1, 100), new LongInterval(1, 100));
