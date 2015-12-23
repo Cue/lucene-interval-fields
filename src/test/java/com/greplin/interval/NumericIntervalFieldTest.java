@@ -54,4 +54,9 @@ public class NumericIntervalFieldTest {
 
     Assert.assertArrayEquals(new long[]{-100, 21253456}, NumericIntervalField.splitParts("-100-21253456"));
   }
+
+  @Test (expected=NumberFormatException.class)
+  public void testEmptyNumbers() throws Exception {
+    long[] result = NumericIntervalField.splitParts("null-null");
+  }
 }
